@@ -1,0 +1,398 @@
+
+// =================================================================
+// =================================================================
+// 1= 
+
+
+
+
+
+1. Create a script that asks for user name then send a greeting to him.
+
+# Q1
+touch greet.sh
+
+#! /usr/bin/bash
+
+echo "Please enter your name:- "
+read name
+echo "Hello, $name"
+
+Terminal => 
+./greet.sh
+
+
+
+
+
+
+2. Create a script called s1 
+that calls another script s2 where:
+    a. In s1 there is a variable called x, it's value 5
+    b. Try to print the value of x in s2 by two different ways.
+
+
+# Q2 
+touch s1.sh s2.sh 
+
+#=> file s1.sh 
+x=5
+./s2.sh $x
+export x
+
+#=> file s2.sh 
+echo  "1-> Value of x from environment variable: $x"
+echo  "2-> Value of x from argument: $1"
+
+
+Terminal => 
+. ./s1.sh
+
+
+
+
+
+
+
+3. Create a script called mycp where:
+    a. It copies a file to another
+    b. It copies multiple files to a directory.
+
+
+# Q3 
+touch mycp.sh
+
+
+
+#-
+if [ "$#" -lt 2 ]
+then
+    echo "Usage: $0 source_file... destination"
+    exit 1
+fi
+
+#-
+dest="${@: -1}"
+
+#-
+if [ -d "$dest" ]
+then
+    #-
+    for src in "$@"
+    do
+        [ "$src" != "$dest" ] && cp -r "$src" "$dest/"
+    done
+else
+    #-
+    cp "$1" "$dest"
+fi
+
+
+
+Terminal => 
+
+# 1=> one file 
+touch file1.txt
+./mycp.sh file1.txt file2.txt
+
+# 2=> multiple files
+mkdir target_directory
+./mycp.sh file1.txt file2.txt target_directory/
+
+
+
+
+
+
+
+
+
+4. Create a script called mycd where:
+    a. It changed directory to the user home directory, if it is called without arguments.
+    b. Otherwise, it change directory to the given directory.
+
+
+
+# Q4
+
+touch mycd.sh 
+
+
+
+if [ $# -eq 0 ]
+then
+    cd ~
+else
+    cd "$1"
+fi
+
+Terminal => 
+. ./mycd.sh
+. ./mycd.sh ~/Documents
+
+
+
+
+
+
+
+5. Create a script called myls where:
+    a. It lists the current directory, if it is called without arguments.
+    b. Otherwise, it lists the given directory.
+
+
+# Q5
+
+touch myls.sh 
+
+
+#! /usr/bin/bash
+
+if [ $# -eq 0 ]
+then
+    ls
+else
+    ls "$1"
+fi
+
+Terminal => 
+./myls.sh 
+./myls.sh ~/Documents
+
+
+
+
+
+
+
+
+6. Enhance the above script to support the following options individually:
+    a. –l: list in long format
+    b. –a: list all entries including the hiding files.
+    c. –d: if an argument is a directory, list only its name
+    d. –i: print inode number
+    e. –R: recursively list subdirectories
+Bonus: enhance the above script to support the following Synopsis:
+    myls -option1 –option2
+    myls –option2 –option1
+    myls –option1option2
+    myls –option2option1
+
+
+# Q6
+
+touch myls2.sh 
+
+
+#! /usr/bin/bash
+options=""
+directory=""
+
+#-
+while [[ "$1" =~ ^- ]] 
+do 
+    options="$options $1"
+    shift
+done
+
+if [ -n "$1" ]
+then
+    directory="$1"
+fi
+
+#-
+if [ -n "$directory" ]
+then
+    ls $options "$directory"
+else
+    ls $options
+fi
+
+
+
+Terminal => 
+# ./myls2.sh
+# ./myls2.sh ~/Documents
+# ./myls2.sh -l
+# ./myls2.sh -a
+# ./myls2.sh -i
+# ./myls2.sh -R
+# ./myls2.sh -la
+# ./myls2.sh -al
+# ./myls2.sh -l -a
+# ./myls2.sh -l -a ~/Documents
+
+
+
+
+
+
+
+
+7. Create a script called mytest where:
+    a. It check the type of the given argument (file/directory)
+    b. It check the permissions of the given argument (read/write/execute)
+
+# Q7
+
+touch mytest.sh 
+
+
+
+
+#! /usr/bin/bash
+
+if [ "$#" -ne 1 ]
+then
+    echo "Usage: $0 type file or directory"
+    exit 1
+fi
+
+target="$1"
+
+if [ -f "$target" ]
+then
+    echo "($target) is a file."
+
+elif [ -d "$target" ]
+then
+    echo "($target) is a directory."
+
+else
+    echo "($target) is not a regular file or directory."
+    exit 1
+    
+fi
+
+echo "Permissions for ($target):"
+[ -r "$target" ] && echo "Readable"
+[ -w "$target" ] && echo "Writable"
+[ -x "$target" ] && echo "Executable"
+
+
+
+
+Terminal => 
+./mytest.sh myls.sh
+./mytest.sh target_directory
+
+
+
+
+
+
+
+
+8. Create a script called myinfo where:
+    a. It asks the user about his/her logname.
+    b. It print full info about files and directories in his/her home directory
+    c. Copy his/her files and directories as much as you can in /tmp directory.
+    d. Gets his current processes status.
+
+
+
+#Q8
+
+touch myinfo.sh 
+
+
+#! /usr/bin/bash
+echo "Please enter your logname:"
+read logname
+
+# echo $(logname)
+
+if [ "$logname" == "$(whoami)" ]
+then
+    echo "Username is correct.🎉🎉"
+
+    echo "Full info about files and directories in home directory: "
+    ls -l /home/"$logname"
+
+    echo "Copying files and directories to /tmp: "
+    cp /home/"$logname"/* /tmp/
+
+    echo "Current processes status:"
+    ps -u "$logname"
+
+else
+    echo "Incorrect username."
+fi 
+
+
+
+Terminal => 
+./myinfo.sh 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// =================================================================
+// =================================================================
+// 1= 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// =================================================================
+// =================================================================
+// 1= 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
